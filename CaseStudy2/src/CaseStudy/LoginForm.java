@@ -126,9 +126,10 @@ LoginFail LoginFail = new LoginFail();
         if (userNameInput.getText().equals(username)&& passwordInput.getText().equals(password)) {
             dispose();
             checkLogin = true;
-            
+            guiMenu.setResizable(false);
             guiMenu.setVisible(true);
         }else{
+            LoginFail.setResizable(false);
             LoginFail.setVisible(true);
             
         }

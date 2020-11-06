@@ -11,6 +11,7 @@ import static CaseStudy.HotelManage.customerList;
 import java.io.IOException;
 import java.io.Serializable;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -307,15 +308,32 @@ public class FormManage extends javax.swing.JFrame implements Serializable {
         model.addRow(new Object[]{HotelRoom.getStandardquantity(), HotelRoom.getSuperiorquantity(), HotelRoom.getDeluxequantity(), HotelRoom.getSuitequantity(), HotelRoom.getPresidentquantity(), HotelRoom.getRoyalSuitequantity(), HotelRoom.getBungalowquantity(),});
 
     }
-
+    boolean checked;
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         // TODO add your handling code here:
         Hotel customer = new Hotel();
         customer.customer.setNameCustomer(nameCustomer.getText());
         customer.customer.setId(Integer.parseInt(id.getText()));
-        customer.customer.setBirthday(LocalDate.parse(birthDay.getText()));
-        customer.customer.setPhoneNumber(Integer.parseInt(phoneNumber.getText()));
-        customer.setNightStay(Integer.parseInt(phoneNumber.getText()));
+        try {
+            customer.customer.setBirthday(LocalDate.parse(birthDay.getText(), DateTimeFormatter.ofPattern("dd/MM/yyyy")));
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null, "lỗi, nhập ngày tháng năm sinh với định dạng mm/dd/yyyy");
+            return;
+        }
+
+        try {
+            customer.customer.setPhoneNumber(Integer.parseInt(phoneNumber.getText()));
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null, "lỗi, nhập số điện thoại định dạng từ 0-9 và không ký tự đặc biệt");
+            return;
+        }
+        try {
+            customer.setNightStay(Integer.parseInt(nightStay1.getText()));
+
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null, "lỗi, nhập số ngày ở định dạng số nguyên từ 0-9 và không ký tự đặc biệt");
+            return;
+        }
         customer.customer.setGender(String.valueOf(genderSelect.getSelectedItem()));
         customer.setChoiceTypeRoom(String.valueOf(typeRoom.getSelectedItem()));
         ///// backup lại data trước khi bị ghi đè
@@ -341,106 +359,126 @@ public class FormManage extends javax.swing.JFrame implements Serializable {
 
     private void checkQuanlityTypeRoom(String choice, Hotel customer) {
         Hotel hotel = new Hotel();
-        switch (choice) {
-            case "Standard":
-                if (hotel.getStandardquantity() <= 0) {
-                    JOptionPane.showMessageDialog(null, "Hạng phòng " + hotel.getStandard() + " Hết phòng, mời chọn hạng phòng khác");
+        checked = CheckedId(customer);
+        if (checked) {
+            JOptionPane.showMessageDialog(null, "Số chứng minh thư đã tồn tại trong hệ thống, vui lòng kiểm tra lại");
+        } else {
+            switch (choice) {
+                case "Standard":
+                    if (hotel.getStandardquantity() <= 0) {
+                        JOptionPane.showMessageDialog(null, "Hạng phòng " + hotel.getStandard() + " Hết phòng, mời chọn hạng phòng khác");
 
-                    break;
+                        break;
 
-                } else {
-                    customerList.add(customer);
+                    } else {
+                        customerList.add(customer);
+                        hotel.setStandardquantity(hotel.getStandardquantity() - 1);
+                        fillToTable();
+                        refreshForm();
+                        break;
 
-                    hotel.setStandardquantity(hotel.getStandardquantity() - 1);
+                    }
+                case "Superior":
+                    if (hotel.getSuperiorquantity() > 0) {
+                        customerList.add(customer);
+                        hotel.setSuperiorquantity(hotel.getSuperiorquantity() - 1);
+                        fillToTable();
+                        refreshForm();
+                        break;
 
-                    fillToTable();
-                    break;
+                    } else {
+                        JOptionPane.showMessageDialog(null, "Hạng phòng " + hotel.getSuperior() + " Hết phòng, mời chọn hạng phòng khác");
 
-                }
-            case "Superior":
-                if (hotel.getSuperiorquantity() > 0) {
-                    customerList.add(customer);
-                    hotel.setSuperiorquantity(hotel.getSuperiorquantity() - 1);
-                    fillToTable();
-                    break;
+                        break;
 
-                } else {
-                    JOptionPane.showMessageDialog(null, "Hạng phòng " + hotel.getSuperior() + " Hết phòng, mời chọn hạng phòng khác");
+                    }
+                case "Deluxe":
+                    if (hotel.getDeluxequantity() > 0) {
+                        customerList.add(customer);
 
-                    break;
+                        hotel.setDeluxequantity(hotel.getDeluxequantity() - 1);
+                        fillToTable();
+                        refreshForm();
+                        break;
 
-                }
-            case "Deluxe":
-                if (hotel.getDeluxequantity() > 0) {
-                    customerList.add(customer);
+                    } else {
+                        JOptionPane.showMessageDialog(null, "Hạng phòng " + hotel.getDeluxe() + " Hết phòng, mời chọn hạng phòng khác");
 
-                    hotel.setDeluxequantity(hotel.getDeluxequantity() - 1);
-                    fillToTable();
-                    break;
+                        break;
 
-                } else {
-                    JOptionPane.showMessageDialog(null, "Hạng phòng " + hotel.getDeluxe() + " Hết phòng, mời chọn hạng phòng khác");
+                    }
+                case "Suite":
+                    if (hotel.getSuitequantity() > 0) {
+                        customerList.add(customer);
 
-                    break;
+                        hotel.setSuitequantity(hotel.getSuitequantity() - 1);
+                        fillToTable();
+                        refreshForm();
+                        break;
 
-                }
-            case "Suite":
-                if (hotel.getSuitequantity() > 0) {
-                    customerList.add(customer);
+                    } else {
+                        JOptionPane.showMessageDialog(null, "Hạng phòng " + hotel.getSuite() + " Hết phòng, mời chọn hạng phòng khác");
 
-                    hotel.setSuitequantity(hotel.getSuitequantity() - 1);
-                    fillToTable();
-                    break;
+                        break;
 
-                } else {
-                    JOptionPane.showMessageDialog(null, "Hạng phòng " + hotel.getSuite() + " Hết phòng, mời chọn hạng phòng khác");
+                    }
+                case "President":
+                    if (hotel.getPresidentquantity() > 0) {
+                        customerList.add(customer);
 
-                    break;
+                        hotel.setPresidentquantity(hotel.getPresidentquantity() - 1);
+                        fillToTable();
+                        refreshForm();
+                        break;
 
-                }
-            case "President":
-                if (hotel.getPresidentquantity() > 0) {
-                    customerList.add(customer);
+                    } else {
+                        JOptionPane.showMessageDialog(null, "Hạng phòng " + hotel.getPresident() + " Hết phòng, mời chọn hạng phòng khác");
 
-                    hotel.setPresidentquantity(hotel.getPresidentquantity() - 1);
-                    fillToTable();
-                    break;
+                        break;
 
-                } else {
-                    JOptionPane.showMessageDialog(null, "Hạng phòng " + hotel.getPresident() + " Hết phòng, mời chọn hạng phòng khác");
+                    }
+                case "RoyalSuite":
+                    if (hotel.getRoyalSuitequantity() > 0) {
+                        customerList.add(customer);
 
-                    break;
+                        hotel.setRoyalSuitequantity(hotel.getRoyalSuitequantity() - 1);
+                        fillToTable();
+                        refreshForm();
+                        break;
 
-                }
-            case "RoyalSuite":
-                if (hotel.getRoyalSuitequantity() > 0) {
-                    customerList.add(customer);
+                    } else {
+                        JOptionPane.showMessageDialog(null, "Hạng phòng " + hotel.getRoyalSuite() + " Hết phòng, mời chọn hạng phòng khác");
 
-                    hotel.setRoyalSuitequantity(hotel.getRoyalSuitequantity() - 1);
-                    fillToTable();
-                    break;
+                        break;
 
-                } else {
-                    JOptionPane.showMessageDialog(null, "Hạng phòng " + hotel.getRoyalSuite() + " Hết phòng, mời chọn hạng phòng khác");
+                    }
+                case "Bungalow":
+                    if (hotel.getBungalowquantity() > 0) {
+                        customerList.add(customer);
 
-                    break;
+                        hotel.setBungalowquantity(hotel.getBungalowquantity() - 1);
+                        fillToTable();
+                        refreshForm();
+                        break;
 
-                }
-            case "Bungalow":
-                if (hotel.getBungalowquantity() > 0) {
-                    customerList.add(customer);
+                    } else {
+                        JOptionPane.showMessageDialog(null, "Hạng phòng " + hotel.getBungalow() + " Hết phòng, mời chọn hạng phòng khác");
 
-                    hotel.setBungalowquantity(hotel.getBungalowquantity() - 1);
-                    fillToTable();
-                    break;
+                        break;
 
-                } else {
-                    JOptionPane.showMessageDialog(null, "Hạng phòng " + hotel.getBungalow() + " Hết phòng, mời chọn hạng phòng khác");
-
-                    break;
-
-                }
+                    }
+            }
         }
+
+    }
+
+    private void refreshForm() {
+        nameCustomer.setText("");
+        id.setText("");
+        birthDay.setText("");
+        phoneNumber.setText("");
+        nightStay1.setText("");
+
     }
 
     private void addDataToFile() {
@@ -457,6 +495,15 @@ public class FormManage extends javax.swing.JFrame implements Serializable {
 
     }
 
+    private boolean CheckedId(Hotel customerCheckID) {
+        for (Hotel customer : customerList) {
+            if (customerCheckID.customer.getId() == customer.customer.getId()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     private void phoneNumberActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_phoneNumberActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_phoneNumberActionPerformed
@@ -467,12 +514,12 @@ public class FormManage extends javax.swing.JFrame implements Serializable {
 
     private void jLabel8AncestorAdded(javax.swing.event.AncestorEvent evt) {//GEN-FIRST:event_jLabel8AncestorAdded
         // TODO add your handling code here:
-       
+
     }//GEN-LAST:event_jLabel8AncestorAdded
 
     private void backToMenuActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_backToMenuActionPerformed
         // TODO add your handling code here:
-         guiMenu guiMenu = new guiMenu();
+        guiMenu guiMenu = new guiMenu();
         dispose();
         guiMenu.setVisible(true);
     }//GEN-LAST:event_backToMenuActionPerformed
